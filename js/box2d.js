@@ -16,22 +16,27 @@ function B2D() {
 }
 
 B2D.prototype = {
-	rect : function (x, y, w, h) {
+	init : function () {
+		this.debugDraw();
+	},
+	rect : function (x, y, w, h, opts) {
 		var fixDef = new b2FixtureDef();
-		fixDef.density = 1;
-		fixDef.friction = 0.5;
+		fixDef.restitution = 0;
+		fixDef.density = opts && opts.density ? opts.density : 1;
+		fixDef.friction = opts && opts.friction ? opts.friction : 0.5;
 		var bodyDef = new b2BodyDef();
-		bodyDef.type = b2Body.bd_staticBody;
+		bodyDef.type = opts && opts.type ? b2Body['b2_' + opts.type.toLowerCase() + 'Body'] : b2Body.b2_staticBody;
 		bodyDef.position.x = ((x + w) - (w / 2)) / this.SCALE;
-		bodyDef.position.y = y / this.SCALE;
+		bodyDef.position.y = (y + (h / 2)) / this.SCALE;
 
 		fixDef.shape = new b2PolygonShape();
-		fixDef.shape.SetAsBox((w / 2) / this.SCALE, h / this.SCALE);
+		fixDef.shape.SetAsBox((w / 2) / this.SCALE, (h / 2) / this.SCALE);
 		this.world.CreateBody(bodyDef).CreateFixture(fixDef);
 	},
-	debugDraw : function (stage) {
+	debugDraw : function () {
 		var debugDraw = new b2DebugDraw();
-		debugDraw.SetSprite(stage.canvas.getContext('2d'));
+		debugDraw.SetSprite(debug.getContext('2d'));
+		debugDraw.SetFillAlpha(0.5);
 		debugDraw.SetDrawScale(this.SCALE);
 		debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
 		this.world.SetDebugDraw(debugDraw);
