@@ -19,19 +19,23 @@ B2D.prototype = {
 	init : function () {
 		this.debugDraw();
 	},
-	rect : function (x, y, w, h, opts) {
+	rect : function (opts) {
 		var fixDef = new b2FixtureDef();
 		fixDef.restitution = 0;
 		fixDef.density = opts && opts.density ? opts.density : 1;
 		fixDef.friction = opts && opts.friction ? opts.friction : 0.5;
+
 		var bodyDef = new b2BodyDef();
-		bodyDef.type = opts && opts.type ? b2Body['b2_' + opts.type.toLowerCase() + 'Body'] : b2Body.b2_staticBody;
-		bodyDef.position.x = ((x + w) - (w / 2)) / this.SCALE;
-		bodyDef.position.y = (y + (h / 2)) / this.SCALE;
+		bodyDef.type = opts.options && opts.options.type ? b2Body['b2_' + opts.options.type.toLowerCase() + 'Body'] : b2Body.b2_staticBody;
+		bodyDef.position.x = ((opts.x + opts.w) - (opts.w / 2)) / this.SCALE;
+		bodyDef.position.y = (opts.y + (opts.h / 2)) / this.SCALE;
 
 		fixDef.shape = new b2PolygonShape();
-		fixDef.shape.SetAsBox((w / 2) / this.SCALE, (h / 2) / this.SCALE);
-		this.world.CreateBody(bodyDef).CreateFixture(fixDef);
+		fixDef.shape.SetAsBox((opts.w / 2) / this.SCALE, (opts.h / 2) / this.SCALE);
+		
+		var body = this.world.CreateBody(bodyDef);
+		body.CreateFixture(fixDef);
+		return new Body(body, opts);
 	},
 	debugDraw : function () {
 		var debugDraw = new b2DebugDraw();
