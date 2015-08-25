@@ -16,25 +16,44 @@ function B2D() {
 }
 
 B2D.prototype = {
-	init : function () {
+	init : function (c) {
 		this.debugDraw();
+
+
+		var contact = new Box2D.Dynamics.b2ContactListener;
+		contact.BeginContact = c.BeginContact;
+		contact.EndContact = function (contact) {
+			
+		};
+		contact.PreSolve = function (contact) {
+			
+		};
+		contact.PostSolve = function (contact) {
+			
+		};
+
+		this.world.SetContactListener(contact);
+
 	},
 	rect : function (opts) {
 		var fixDef = new b2FixtureDef();
 		fixDef.restitution = 0;
-		fixDef.density = opts && opts.density ? opts.density : 1;
-		fixDef.friction = opts && opts.friction ? opts.friction : 0.5;
+		fixDef.density = opts.density ? opts.density : 1;
+		fixDef.friction = opts.friction ? opts.friction : 0.5;
 
 		var bodyDef = new b2BodyDef();
-		bodyDef.type = opts.options && opts.options.type ? b2Body['b2_' + opts.options.type.toLowerCase() + 'Body'] : b2Body.b2_staticBody;
+		bodyDef.type = opts.type ? b2Body['b2_' + opts.type.toLowerCase() + 'Body'] : b2Body.b2_staticBody;
 		bodyDef.position.x = ((opts.x + opts.w) - (opts.w / 2)) / this.SCALE;
 		bodyDef.position.y = (opts.y + (opts.h / 2)) / this.SCALE;
+		bodyDef.userData = opts;
 
 		fixDef.shape = new b2PolygonShape();
 		fixDef.shape.SetAsBox((opts.w / 2) / this.SCALE, (opts.h / 2) / this.SCALE);
 		
+
 		var body = this.world.CreateBody(bodyDef);
 		body.CreateFixture(fixDef);
+
 		return new Body(body, opts);
 	},
 	debugDraw : function () {
