@@ -1,17 +1,22 @@
-function Assassin (stage, obj) {
+function Assassin (socket, stage, remote) {
 	this.stage = stage;
+	this.socket = socket;
 
-	this.x = 10;
-	this.y = 300;
+	this.x = Math.random() * canvas.width / 2 + canvas.width;
+	this.y = Math.random() * canvas.height;		
+
 	this.h = 80;
 	this.w = 40;
 	this.speed = 5;
 	this.type = 'dynamic';
 	this.id = 'Assassin';
 	this.hp = 100;
+	this.remote = remote;
 
-	if(obj)
-		for(var i in obj)this[i] = obj[i];
+	this.bullets = 0;
+
+	if(remote)
+		for(var i in remote)this[i] = remote[i];
 
 	// Movement
 	this.left;
@@ -22,9 +27,17 @@ function Assassin (stage, obj) {
 }
 
 Assassin.prototype = {
-	init : function () {
-		this.registerKeyDown();
-		this.registerKeyUp();
+	init : function (obj) {
+		if(obj){
+			this.id += obj.id;
+			this.x = Math.random() * (canvas.width / 2) + (canvas.width / 2);
+		}
+
+		if(!this.remote){
+			this.registerKeyDown();
+			this.registerKeyUp();
+		}
+		this.registerSocketEvents();
 		this.create();
 	},
 	tick : function () {
@@ -42,10 +55,18 @@ Assassin.prototype = {
 		} 
 	},
 	registerKeyDown : function () {
-		$(document).on('keydown.assassin', this.keyDown.bind(this));
+		$(document).on('keydown.assassin', this.handleKeyDown.bind(this));
 	},
 	registerKeyUp : function () {
-		$(document).on('keyup.assassin', this.keyUp.bind(this));
+		$(document).on('keyup.assassin', this.handleKeyUp.bind(this));
+	},
+	registerSocketEvents : function () {
+		if(this.remote){
+			this.socket.on('destroyAssassin', this.destroy.bind(this));	
+			this.socket.on('keyUp', this.keyUp.bind(this));
+			this.socket.on('keyDown', this.keyDown.bind(this));
+		}else{
+		}
 	},
 	create : function () {
 		this.body = box2d.rect(this.getObj());
@@ -64,27 +85,34 @@ Assassin.prototype = {
 		
 	},
 	shoot : function () {
+		this.bullets++;
+
 		var bullet = new Bullet({
 		   	x : this.getX() + this.w + 10, 
 		   	y : this.getY() + (this.h / 2), 
 		   	w : 10, 
 		   	h : 10,
 	   		type : 'dynamic',
-	   		id : 1
+	   		id : this.bullets
 		});
 		bullet.init();
 		stage.create(bullet);
 		bullet.shoot();
 	},
 	contact : function (item) {
-		if(item && item.id.match('Bullet'))
+		if(item && item.id.match('Bullet')){
 			this.hp -= 10;
+			console.log(this.hp);
+		}
 
 		if(this.hp <= 0)
 			this.destroy();
+
+		this.hasContact = false;
+
 	},
-	destroy : function () {
-		alert('You died');
+	destroy : function (obj) {
+		this.body.destroy();
 	},
 	getX : function () {
 		return this.body.getX() - (this.w / 2);
@@ -103,11 +131,19 @@ Assassin.prototype = {
 			type : this.type
 		};
 	},
-	keyDown : function (e) {
-		this[this.keys(e.keyCode)] = true;
+	handleKeyUp : function (e) {
+		this.socket.emit('keyUp', e.keyCode);
+		this.keyUp(e.keyCode);
 	},
-	keyUp : function (e) {
-		this[this.keys(e.keyCode)] = false;
+	handleKeyDown : function (e) {
+		this.socket.emit('keyDown', e.keyCode);
+		this.keyDown(e.keyCode);
+	},
+	keyDown : function (keyCode) {
+		this[this.keys(keyCode)] = true;
+	},
+	keyUp : function (keyCode) {
+		this[this.keys(keyCode)] = false;
 	},
 	keys : function (key) {
 		var keys = {

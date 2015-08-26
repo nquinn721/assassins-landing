@@ -3,7 +3,7 @@ function Bullet(obj) {
 	this.y = obj.y || 10;
 	this.w = obj.w || 10;
 	this.h = obj.h || 10;
-	this.type = 'static';//obj.type || 'dynamic';
+	this.type = obj.type || 'dynamic';
 	this.id = 'Bullet' + (obj.id || '');
 	this.speed = obj.speed || 8;
 }
@@ -27,9 +27,16 @@ Bullet.prototype = {
 		this.body = box2d.rect(this.getObj());
 	},
 	shoot : function () {
-		// this.body.applyForce('right', 10);
+		this.body.applyForce('right', 10);
+	},
+	contact : function () {
+		var self = this;
+		this.body.destroy(function () {
+			self.hasContact = false;
+		});	
+		// stage.destroy(this);
 	},
 	tick : function () {
-		this.body.right();
+		// this.body.right();
 	}
 }

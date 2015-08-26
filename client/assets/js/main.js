@@ -1,19 +1,10 @@
 var stage = new Stage();
-var assassin = new Assassin(stage);
-assassin.init();
-stage.init();
-
 var socket = new Socket();
 socket.init();
+stage.init();
 
-socket.emit('assassin', {
-   id : 'assassin1',
-   x : 500, 
-   y : 300, 
-   w : 40, 
-   h : 80, 
-   speed : 5
-});
+
+
 
 // Floor
 box2d.rect({

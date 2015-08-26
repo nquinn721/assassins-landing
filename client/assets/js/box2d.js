@@ -9,28 +9,22 @@ var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
 var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
 var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
-
 function B2D() {
    	this.SCALE = 30;
-    this.world = new b2World(new b2Vec2(0, 50), true);
+    this.world = world = new b2World(new b2Vec2(0, 70), true);
 }
 
 B2D.prototype = {
 	init : function (c) {
+		var self = this;
 		this.debugDraw();
 
 
 		var contact = new Box2D.Dynamics.b2ContactListener;
-		contact.BeginContact = c.BeginContact;
-		contact.EndContact = function (contact) {
-			
-		};
-		contact.PreSolve = function (contact) {
-			
-		};
-		contact.PostSolve = function (contact) {
-			
-		};
+		// contact.BeginContact = c.BeginContact;
+		// contact.EndContact = c.BeginContact;
+		// contact.PreSolve = c.BeginContact;
+		contact.PostSolve = c.BeginContact;
 
 		this.world.SetContactListener(contact);
 
