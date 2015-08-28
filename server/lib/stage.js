@@ -111,8 +111,6 @@ Stage.prototype = {
 	},
 	updateClientPositions : function () {
 		for(var i = 0; i < this.items.length; i++){
-			console.log(this.items[i].getObj());
-
 			this.io.emit('updatePosition', this.items[i].getObj())
 		}
 	}
