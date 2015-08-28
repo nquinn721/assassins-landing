@@ -1,6 +1,6 @@
 var express = require('express'),
 	app = express(),
-	io = require('socket.io').listen(app.listen(3000)),
+	io = require('socket.io').listen(app.listen(process.env.PORT || 3000)),
 	jade = require('jade'),
 	_ = require('underscore'),
 	stage = require('./server/lib/stage.js');
