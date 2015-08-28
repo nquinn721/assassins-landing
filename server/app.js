@@ -2,8 +2,11 @@ var express = require('express'),
 	app = express(),
 	io = require('socket.io').listen(app.listen(3000)),
 	jade = require('jade'),
-	_ = require('underscore');
+	_ = require('underscore'),
+	stage = require('./lib/stage.js');
 
+stage = new stage(io);
+stage.init();
 
 app.use(express.static(__dirname + '/../client/assets'));
 app.set('view engine', 'jade');
@@ -17,45 +20,19 @@ app.get('/', function (req, res) {
 	res.render('index');
 });
 
-app.get('/assassin', function (req, res) {
-	console.log(req);
-});
 
-
-var assassins = {},
-	totalAssassins = 0;
 
 io.on('connection', function (socket) {
+	
+	stage.setupSocketListeners(socket);
 
 	socket.on('login', function () {
-		var obj = {id : totalAssassins, x : false};
-		totalAssassins++;
-
-		console.log(totalAssassins);
-		if(totalAssassins === 1)
-			obj.x = true;
-
-		socket.emit('newAssassin', obj);
+		stage.login(io, socket);
 	});
-
-	socket.on('assassin', function (obj) {
-		assassins[socket.id] = obj;
-		socket.broadcast.emit('createAssassin', obj);
-
-		for(var i in assassins)
-			if(i !== socket.id)
-				socket.emit('createAssassin', assassins[i]);
-	});
-	socket.on('keyUp', function (obj) {
-		socket.broadcast.emit('keyUp', obj);
-	});
-	socket.on('keyDown', function (obj) {
-		socket.broadcast.emit('keyDown', obj);
-	});
-	socket.on('logout', function () {
-		// totalAssassins = _.size(assassins);
-		totalAssassins--;
-		socket.broadcast.emit('destroyAssassin', assassins[socket.id]);
-		delete assassins[socket.id];
+	socket.on('disconnect', function () {
+		if(socket.assassin){
+			stage.logout(socket.assassin.id);
+			io.emit('destroyAssassin', socket.assassin.getObj());
+		}
 	});
 });

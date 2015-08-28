@@ -1,6 +1,7 @@
-var stage = new Stage();
-var socket = new Socket();
-socket.init();
+var box2d = new B2D(Box2D, Body);
+var socket = new Socket(box2d, Bullet);
+var stage = new Stage(socket);
+socket.init(stage);
 stage.init();
 
 

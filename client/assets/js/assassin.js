@@ -1,22 +1,21 @@
-function Assassin (socket, stage, remote) {
+function Assassin (stage, bullet, box2d, obj, user) {
 	this.stage = stage;
-	this.socket = socket;
+	this.box2d = box2d;
+	this.Bullet = bullet;
 
-	this.x = Math.random() * canvas.width / 2 + canvas.width;
-	this.y = Math.random() * canvas.height;		
+	this.x = obj.x || Math.random() * canvas.width / 2 + canvas.width / 2;
+	this.y = obj.y || Math.random() * canvas.height;		
 
-	this.h = 80;
-	this.w = 40;
-	this.speed = 5;
-	this.type = 'dynamic';
-	this.id = 'Assassin';
-	this.hp = 100;
-	this.remote = remote;
+	this.h = obj.h || 80;
+	this.w = obj.w || 40;
+	this.speed = obj.speed || 5;
+	this.type = obj.type || 'dynamic';
+	this.id = obj.id || 'Assassin';
+	this.hp = obj.hp || 100;
+
+	this.user = user;
 
 	this.bullets = 0;
-
-	if(remote)
-		for(var i in remote)this[i] = remote[i];
 
 	// Movement
 	this.left;
@@ -27,22 +26,15 @@ function Assassin (socket, stage, remote) {
 }
 
 Assassin.prototype = {
-	init : function (obj) {
-		if(obj){
-			this.id += obj.id;
-			this.x = Math.random() * (canvas.width / 2) + (canvas.width / 2);
-		}
-
-		if(!this.remote){
-			this.registerKeyDown();
-			this.registerKeyUp();
-		}
-		this.registerSocketEvents();
+	init : function () {
 		this.create();
 	},
 	tick : function () {
 		this.left && this.moveLeft();
 		this.right && this.moveRight();
+
+		this.x = this.body.getX();
+		this.y = this.body.getY();
 
 		if(this.jumping && this.jumpAvailable){
 			this.jump();
@@ -54,23 +46,14 @@ Assassin.prototype = {
 			this.shooting = false;	
 		} 
 	},
-	registerKeyDown : function () {
-		$(document).on('keydown.assassin', this.handleKeyDown.bind(this));
+
+	create : function (user) {
+		this.body = this.box2d.rect(this.getObj());
 	},
-	registerKeyUp : function () {
-		$(document).on('keyup.assassin', this.handleKeyUp.bind(this));
-	},
-	registerSocketEvents : function () {
-		if(this.remote){
-			this.socket.on('destroyAssassin', this.destroy.bind(this));	
-			this.socket.on('keyUp', this.keyUp.bind(this));
-			this.socket.on('keyDown', this.keyDown.bind(this));
-		}else{
-		}
-	},
-	create : function () {
-		this.body = box2d.rect(this.getObj());
-		this.stage.create(this);
+	setPosition : function (obj) {
+		console.log(obj.x);
+		this.body.setX(obj.x);
+		this.body.setY(obj.y);
 	},
 	moveRight : function () {
 		this.body.right();
@@ -87,16 +70,14 @@ Assassin.prototype = {
 	shoot : function () {
 		this.bullets++;
 
-		var bullet = new Bullet({
+		var bullet = new this.Bullet(this.box2d, {
 		   	x : this.getX() + this.w + 10, 
 		   	y : this.getY() + (this.h / 2), 
 		   	w : 10, 
 		   	h : 10,
-	   		type : 'dynamic',
 	   		id : this.bullets
 		});
 		bullet.init();
-		stage.create(bullet);
 		bullet.shoot();
 	},
 	contact : function (item) {
@@ -132,11 +113,9 @@ Assassin.prototype = {
 		};
 	},
 	handleKeyUp : function (e) {
-		this.socket.emit('keyUp', e.keyCode);
 		this.keyUp(e.keyCode);
 	},
 	handleKeyDown : function (e) {
-		this.socket.emit('keyDown', e.keyCode);
 		this.keyDown(e.keyCode);
 	},
 	keyDown : function (keyCode) {
@@ -157,3 +136,6 @@ Assassin.prototype = {
 	}
 }
 
+
+if (typeof module !== "undefined" && module.exports)
+	module.exports = Assassin;

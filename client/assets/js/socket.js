@@ -1,24 +1,32 @@
-function Socket () {
+function Socket (box2d, bullet) {
+	this.box2d = box2d;
 	this.io = io.connect();
+	this.bullet = bullet;
 }
 
 Socket.prototype = {
-	init : function () {
+	init : function (stage) {
+		this.stage = stage;
 		this.emit('login');
 		this.setupListeners();
 	},
 	setupListeners : function () {
-		this.on('createAssassin', this.createAssassin.bind(this));
 		this.on('newAssassin', this.newAssassin.bind(this));
+		this.on('userAssassin', this.userAssassin.bind(this));
+		this.on('updatePosition', this.updateObjectPositions.bind(this));
 	},
-	createAssassin : function (obj) {
-		var assassin = new Assassin(this, stage, obj);
+	updateObjectPositions : function (obj) {
+		this.stage.updatePosition(obj);
+	},
+	userAssassin : function (obj) {
+		var assassin = new Assassin(stage, this.bullet, this.box2d, obj, true);	
 		assassin.init();
+		this.stage.createUser(assassin);
 	},
-	newAssassin : function (id) {
-	   var assassin = new Assassin(this, stage);
-	   assassin.init(id);
-	   this.emit('assassin', assassin.getObj());
+	newAssassin : function (obj) {
+	   var assassin = new Assassin(stage, this.bullet, this.box2d, obj);
+	   assassin.init();
+	   this.stage.create(assassin);
 	},
 	emit : function (event, data) {
 		this.io.emit(event, data);

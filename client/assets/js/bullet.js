@@ -1,9 +1,10 @@
-function Bullet(obj) {
+function Bullet(box2d, obj) {
+	this.box2d = box2d;
 	this.x = obj.x || 10;
 	this.y = obj.y || 10;
 	this.w = obj.w || 10;
 	this.h = obj.h || 10;
-	this.type = obj.type || 'dynamic';
+	this.type = 'kinematic';
 	this.id = 'Bullet' + (obj.id || '');
 	this.speed = obj.speed || 8;
 }
@@ -23,8 +24,12 @@ Bullet.prototype = {
 			type : this.type
 		};
 	},
+	setPosition : function (obj) {
+		this.body.setX(obj.x);
+		this.body.setY(obj.y);
+	},
 	create : function () {
-		this.body = box2d.rect(this.getObj());
+		this.body = this.box2d.rect(this.getObj());
 	},
 	shoot : function () {
 		this.body.applyForce('right', 10);
@@ -40,3 +45,6 @@ Bullet.prototype = {
 		// this.body.right();
 	}
 }
+
+if (typeof module !== "undefined" && module.exports)
+	module.exports = Bullet;

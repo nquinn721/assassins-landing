@@ -1,8 +1,8 @@
-function Body (bodyFixture, opts) {
+function Body (bodyFixture, b2Vec2, opts) {
 	this.body = bodyFixture;
 	this.SCALE = 30;
 	this.speed = opts && opts.speed ? opts.speed : 5;
-
+	this.b2Vec2 = b2Vec2;
 	this.opts = opts;
 
 }
@@ -26,16 +26,20 @@ Body.prototype = {
 	right : function () {
 		this.move('right');
 	},
+	updateXYFromServer : function (x, y) {
+		this.setX(x);
+		this.setY(y);	
+	},
 	applyForce : function (dir, speed) {
 		var vec;
 		if(dir === 'right')
-			vec = new b2Vec2((speed || this.speed) * this.SCALE, 0);
+			vec = new this.b2Vec2((speed || this.speed) * this.SCALE, 0);
 		if(dir === 'left')
-			vec = new b2Vec2(-((speed || this.speed) * this.SCALE), 0);
+			vec = new this.b2Vec2(-((speed || this.speed) * this.SCALE), 0);
 		if(dir === 'down')
-			vec = new b2Vec2(0, (speed || this.speed) * this.SCALE);
+			vec = new this.b2Vec2(0, (speed || this.speed) * this.SCALE);
 		if(dir === 'up')
-			vec = new b2Vec2(0, -((speed || this.speed) * this.SCALE));
+			vec = new this.b2Vec2(0, -((speed || this.speed) * this.SCALE));
 
 		this.body.ApplyForce( vec , this.body.GetPosition() );
 
@@ -60,3 +64,6 @@ Body.prototype = {
 		}, 0);
 	}
 }
+
+if (typeof module !== "undefined" && module.exports)
+	module.exports = Body;
