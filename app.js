@@ -3,14 +3,14 @@ var express = require('express'),
 	io = require('socket.io').listen(app.listen(3000)),
 	jade = require('jade'),
 	_ = require('underscore'),
-	stage = require('./lib/stage.js');
+	stage = require('./server/lib/stage.js');
 
 stage = new stage(io);
 stage.init();
 
-app.use(express.static(__dirname + '/../client/assets'));
+app.use(express.static(__dirname + '/client/assets'));
 app.set('view engine', 'jade');
-app.set('views', __dirname + '/../client/');
+app.set('views', __dirname + '/client/');
 
 app.get('/game', function (req, res) {
 	res.render('game');
