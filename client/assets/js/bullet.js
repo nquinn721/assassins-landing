@@ -4,6 +4,7 @@ function Bullet(box2d, obj) {
 	this.y = obj.y || 10;
 	this.w = obj.w || 10;
 	this.h = obj.h || 10;
+	this.direction = obj.direction || 'right';
 	this.type = 'kinematic';
 	this.id = 'Bullet' + (obj.id || '');
 	this.speed = obj.speed || 8;
@@ -32,7 +33,7 @@ Bullet.prototype = {
 		this.body = this.box2d.rect(this.getObj());
 	},
 	shoot : function () {
-		this.body.applyForce('right', 10);
+		this.body.right();
 	},
 	contact : function () {
 		var self = this;
@@ -42,7 +43,15 @@ Bullet.prototype = {
 		// stage.destroy(this);
 	},
 	tick : function () {
-		// this.body.right();
+		if(this.direction === 'right')
+			this.body.right();
+		else this.body.left();
+
+		this.x = this.body.getX();
+		this.y = this.body.getY();
+	},
+	destroy : function () {
+		this.body.destroy();
 	}
 }
 

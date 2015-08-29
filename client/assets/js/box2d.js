@@ -47,6 +47,7 @@ B2D.prototype = {
 		bodyDef.position.x = ((opts.x + opts.w) - (opts.w / 2)) / this.SCALE;
 		bodyDef.position.y = (opts.y + (opts.h / 2)) / this.SCALE;
 		bodyDef.fixedRotation = true;
+		bodyDef.linearDamping = opts.linearDamping || 0;
 		bodyDef.userData = opts;
 
 		fixDef.shape = new this.b2PolygonShape();

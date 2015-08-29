@@ -1,5 +1,5 @@
-var width = 800,
-	height = 400,
+var width = manager.canvas.width,
+	height = manager.canvas.height,
 	canvas = document.getElementById('game'),
 	debug = document.getElementById('debug');
 

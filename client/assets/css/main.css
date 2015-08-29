@@ -1,8 +1,12 @@
-canvas{
+.viewport{
 	height:400px;
 	width:800px;
 	border: 1px solid black;
 	position: absolute;
 	left : 50%;
 	margin-left: -400px;
+	overflow: hidden;
+}
+canvas{
+	position: absolute;
 }

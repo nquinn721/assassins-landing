@@ -26,6 +26,10 @@ io.on('connection', function (socket) {
 	
 	stage.setupSocketListeners(socket);
 
+	socket.on('setupCanvas', function (obj) {
+		stage.initCanvas(obj);
+	});
+
 	socket.on('login', function () {
 		stage.login(io, socket);
 	});

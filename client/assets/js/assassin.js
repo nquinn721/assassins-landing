@@ -12,6 +12,8 @@ function Assassin (stage, bullet, box2d, obj, user) {
 	this.type = obj.type || 'dynamic';
 	this.id = obj.id || 'Assassin';
 	this.hp = obj.hp || 100;
+	this.shootDirection = obj.shootDirection || 'right';
+	this.linearDamping = 0;
 
 	this.user = user;
 
@@ -33,6 +35,8 @@ Assassin.prototype = {
 		this.create();
 	},
 	tick : function () {
+		var self = this;
+
 		this.left && this.moveLeft();
 		this.right && this.moveRight();
 		this.frames++;
@@ -40,15 +44,18 @@ Assassin.prototype = {
 		this.x = this.body.getX();
 		this.y = this.body.getY();
 
-		if(this.jumping && this.jumpAvailable){
+		if(this.jumping){
+			this.jumping = false;
 			this.jump();
-			// this.jumpAvailable = false;
 		}
 
 		if(this.shooting){
 			this.shoot(); 
 			this.shooting = false;	
 		} 
+
+		if(this.hp <= 0)
+			this.destroy();
 
 	},
 
@@ -60,37 +67,56 @@ Assassin.prototype = {
 		this.body.setY(obj.y);
 	},
 	moveRight : function () {
-		this.body.right();
+		this.body.move('right');
 	},
 	moveLeft : function () {
-		this.body.left();
+		this.body.move('left');
 	},
 	jump : function () {
-		this.body.applyForce('up', 10);
+		if(this.jumpAvailable){
+			this.jumpAvailable = false;
+			this.body.applyImpulse('up', 3);
+			
+		}
+
 	},
 	duck : function () {
 		
 	},
 	shoot : function () {
 		this.bullets++;
-
+		var x = this.shootDirection === 'right' ? this.getX() + this.w + 10 : this.getX() - 20;
 		var bullet = new this.Bullet(this.box2d, {
-		   	x : this.getX() + this.w + 10, 
+		   	x : x,
 		   	y : this.getY() + (this.h / 2), 
 		   	w : 10, 
 		   	h : 10,
-	   		id : this.bullets
+	   		id : this.bullets,
+	   		direction : this.shootDirection
 		});
 		bullet.init();
 		bullet.shoot();
+		this.stage.create(bullet);
 	},
 	contact : function (item) {
-		if(item && item.id.match('Bullet')){
-			this.hp -= 10;
+		var id = null, self = this;
+		
+		if(item){
+			id = item.id ? item.id : item.opts.id;
 		}
 
-		if(this.hp <= 0)
-			this.destroy();
+		if(id){
+
+			if(id.match('Bullet')){
+				this.hp -= 10;
+			}
+
+			if(id.match('Floor')){
+				setTimeout(function () {
+					self.jumpAvailable = true;
+				}, 300);
+			}
+		}
 
 		this.hasContact = false;
 
@@ -112,7 +138,9 @@ Assassin.prototype = {
 			w : this.w, 
 			h : this.h, 
 			speed : this.speed, 
-			type : this.type
+			shootDirection : this.shootDirection,
+			type : this.type,
+			linearDamping : this.linearDamping
 		};
 	},
 	handleKeyUp : function (e) {
@@ -122,10 +150,23 @@ Assassin.prototype = {
 		this.keyDown(e.keyCode);
 	},
 	keyDown : function (keyCode) {
-		this[this.keys(keyCode)] = true;
+		var key = this.keys(keyCode);
+
+		if(key === 'jumping'){
+			if(this.jumpAvailable)
+				this[key] = true;
+		}else{
+			this[key] = true;
+		}
 	},
 	keyUp : function (keyCode) {
-		this[this.keys(keyCode)] = false;
+		var key = this.keys(keyCode);
+
+		if(key === 'jumping'){
+			// this[key] = false;
+		}else{
+			this[key] = false;
+		}
 	},
 	keys : function (key) {
 		var keys = {

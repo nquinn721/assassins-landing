@@ -27,7 +27,7 @@ Socket.prototype = {
 	newAssassin : function (obj) {
 	   var assassin = new Assassin(stage, this.bullet, this.box2d, obj);
 	   assassin.init();
-	   this.stage.create(assassin);
+	   this.stage.createAssassin(assassin);
 	},
 	emit : function (event, data) {
 		this.io.emit(event, data);

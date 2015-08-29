@@ -4,12 +4,14 @@ var url = __dirname + '/../../client/assets/js/',
 	Assassin = require(url + 'assassin.js'),
 	Body = require(url + 'body.js'),
 	Bullet = require(url + 'bullet.js'),
+	Manager = require(url + 'manager.js'),
+	WallsAndFloor = require(url + 'wallsAndFloor.js'),
 	_ = require('underscore');
 
 
 
 box2d = new box2d(Box2D, Body);
-
+manager = new Manager(box2d);
 
 function Stage (io) {
 	this.io = io;
@@ -17,27 +19,44 @@ function Stage (io) {
    	this.items = [];
    	this.assassins = [];
    	this.frames = 0;
+
+   	this.canvas = {
+   		width : 3200,
+   		height : 2400
+   	}
+
+   	this.canvas;
 }
 
 Stage.prototype = {
+	initCanvas : function () {
+		
+	},
 	init : function () {
-		var self = this;
-		box2d.init({
-		 	BeginContact : this.beginContact.bind(this)
-		});
+		WallsAndFloor(this, box2d);
+		manager.init();
 		this.ticker();
-		this.interval = setInterval(function () {
-			self.tick();
-		}, 1000 / 60);
+		
 	},
 	login : function (io, socket) {
-		var assassin = new Assassin(this, Bullet, box2d, {id : 'Assassin' + this.totalAsassins, x : Math.random() * 800, y : 10});
+		var assassin;
+		this.totalAsassins++;
+
+		if(this.assassins.length === 1){
+			x = Math.random() * 200;
+		}else {
+			x = Math.random() * 200 + (manager.canvas.width - 200);
+
+		}
+		assassin = new Assassin(this, Bullet, box2d, {id : 'Assassin' + this.totalAsassins, x : x, y : 10});
 		assassin.init();
 
 		this.assassins.push(assassin);
 		this.items.push(assassin);
+		
+		if(this.assassins.length === 2)
+			assassin.shootDirection = 'left';
 
-		this.totalAsassins++;
 		socket.assassin = assassin;
 
 		socket.emit('userAssassin', assassin.getObj());
@@ -74,8 +93,7 @@ Stage.prototype = {
 	  	this.assassins.splice(this.assassins.indexOf(item), 1);
 	},
 	create : function (obj) {
-	  	this.items.push(obj);
-	  	this.totalAsassins++;
+		manager.create(obj);
 	},
 	setupSocketListeners : function (socket) {
 		socket.on('keyUp', function (obj) {
@@ -94,18 +112,15 @@ Stage.prototype = {
 		
 	},
 	ticker : function () {
+		var self = this;
+		this.interval = setInterval(function () {
+			manager.tick(self.tick);
+		}, 1000 / 60);
 	},
 	getById : function (id) {
 	  return _.findWhere(this.items, {id : id});
 	},
 	tick : function () {
-	  	box2d.tick();
-	  	for(var i = 0; i < this.items.length; i++){
-	     	if(this.items[i].tick)this.items[i].tick();
-	  	}
-
-	    this.frames++;
-
 
 	    if(this.frames % 10 === 0)
 	    	this.updateClientPositions();
@@ -114,39 +129,41 @@ Stage.prototype = {
 	updateClientPositions : function () {
 		for(var i = 0; i < this.items.length; i++){
 			var obj = this.items[i].getObj();
-			this.io.emit('updatePosition', obj);
+			// this.io.emit('updatePosition', obj);
 		}
 	}
 }
 
 
 // Floor
-box2d.rect({
+var floor = box2d.rect({
    x : 0, 
    y : 380, 
    w : 800, 
-   h : 20
+   h : 20,
+   id : 'Floor'
 });
 // Left Wall
-box2d.rect({
+var leftwall = box2d.rect({
    x : 0, 
    y : 0, 
    w : 0, 
-   h : 400
+   h : 400,
 });
-// Left Wall
-box2d.rect({
+// Right Wall
+var rightwall = box2d.rect({
    x : 800, 
    y : 0, 
    w : 0, 
-   h : 400
+   h : 400,
 });
 // Ceiling
-box2d.rect({
+var ceiling = box2d.rect({
    x : 0, 
    y : 0, 
    w : 800, 
-   h : 0
+   h : 0,
 });
+
 
 module.exports = Stage;
