@@ -12,7 +12,7 @@ Map.prototype = {
 			this.create();
 	},
 	create : function () {
-		for(var i = 0; i < 10; i++){
+		for(var i = 0; i < 20; i++){
 			var obj = {
 		         x : Math.random() * manager.canvas.width,
 		         y : Math.random() * manager.canvas.height,
