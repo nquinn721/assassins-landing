@@ -17,6 +17,7 @@ canvas{
     color: white;
     font-size: 50px;
     text-align: center;
+    display: none;
 }
 
 .die span {
