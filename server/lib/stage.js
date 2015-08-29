@@ -107,7 +107,8 @@ Stage.prototype = {
 	    this.frames++;
 
 
-    	this.updateClientPositions();
+	    if(this.frames % 10 === 0)
+	    	this.updateClientPositions();
 
 	},
 	updateClientPositions : function () {
