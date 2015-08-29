@@ -16,12 +16,15 @@ function Assassin (stage, bullet, box2d, obj, user) {
 	this.user = user;
 
 	this.bullets = 0;
+	this.frames = 0;
 
 	// Movement
 	this.left;
 	this.right;
 	this.shooting;
 	this.jumpAvailable = true;
+
+
 
 }
 
@@ -32,6 +35,7 @@ Assassin.prototype = {
 	tick : function () {
 		this.left && this.moveLeft();
 		this.right && this.moveRight();
+		this.frames++;
 
 		this.x = this.body.getX();
 		this.y = this.body.getY();
@@ -45,6 +49,7 @@ Assassin.prototype = {
 			this.shoot(); 
 			this.shooting = false;	
 		} 
+
 	},
 
 	create : function (user) {
@@ -83,7 +88,6 @@ Assassin.prototype = {
 	contact : function (item) {
 		if(item && item.id.match('Bullet')){
 			this.hp -= 10;
-			console.log(this.hp);
 		}
 
 		if(this.hp <= 0)

@@ -99,8 +99,9 @@ Stage.prototype = {
 	},
 	tick : function () {
 	  	box2d.tick();
-	  	for(var i = 0; i < this.items.length; i++)
+	  	for(var i = 0; i < this.items.length; i++){
 	     	if(this.items[i].tick)this.items[i].tick();
+	  	}
 
 	    this.frames++;
 
@@ -111,7 +112,8 @@ Stage.prototype = {
 	},
 	updateClientPositions : function () {
 		for(var i = 0; i < this.items.length; i++){
-			this.io.emit('updatePosition', this.items[i].getObj())
+			var obj = this.items[i].getObj();
+			this.io.emit('updatePosition', obj);
 		}
 	}
 }

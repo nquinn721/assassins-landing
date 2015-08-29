@@ -88,9 +88,8 @@ Stage.prototype = {
       this.items.splice(this.items.indexOf(item), 1);
    },
    updatePosition : function (obj) {
-      var obj = this.getById(obj.id);
-
-      obj.setPosition(obj);
+      var assassin = this.getById(obj.id);
+      assassin.setPosition(obj);
    },
    getById : function (id) {
       return _.findWhere(this.items, {id : id});
