@@ -13,9 +13,6 @@ function Stage (socket, manager) {
       height : 400
    };
 
-   this.currentx = 0;
-   this.currenty = 0;
-
    this.canvasElement = $('canvas');
 
    this.user;
@@ -29,6 +26,8 @@ Stage.prototype = {
    },
    createUser : function (obj) {
       this.manager.createUser(obj);
+      this.currentx = obj.x;
+      this.currenty = obj.y;
       this.setupKeyEvents();
    },
    createAssassin : function (obj) {
@@ -77,24 +76,15 @@ Stage.prototype = {
          canvasWidth = this.manager.canvas.width,
          canvasHeight = this.manager.canvas.height,
          user = this.manager.user,
-         canvas = this.canvasElement;
+         canvas = this.canvasElement,
+         top = Math.abs(parseInt(canvas.css('top')));
 
-      // Move canvas right
-      if(user.x > viewWidth / 2 && user.right && user.x.toFixed() > this.currentx.toFixed() && user.x + viewWidth / 2 < canvasWidth)
+      // Move canvas left and right
+      if(user.x > viewWidth / 2 && user.x  < canvasWidth - (viewWidth / 2))
          canvas.css('left', -(user.x - viewWidth / 2));
-      // Move canvas left
-      else if(user.left && user.x > viewWidth / 2 && user.x.toFixed() < this.currentx.toFixed() && user.x < canvasWidth - (viewWidth / 2))
-         canvas.css('left', -(user.x - viewWidth / 2) + 15);
       // Move canvas up and down
-      if(user.y > viewHeight / 2 && user.y.toFixed() !== this.currenty.toFixed() && user.y < canvasHeight - viewHeight / 2)
-         canvas.css('top', -(user.y - viewHeight / 2) - 25);
-
-      this.currenty = user.y;
-      this.currentx = user.x;
-
-   },
-
-   updateCanvasElement : function () {
+      if(user.y + user.h > viewHeight / 2 && user.y < canvasHeight - viewHeight / 2)
+            canvas.css('top', -(user.y - viewHeight / 2));
    },
    
    tick : function () {
