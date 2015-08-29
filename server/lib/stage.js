@@ -40,7 +40,8 @@ Stage.prototype = {
 		this.totalAsassins++;
 		socket.assassin = assassin;
 
-		io.emit('userAssassin', assassin.getObj());
+		socket.emit('userAssassin', assassin.getObj());
+		socket.broadcast.emit('newAssassin', assassin.getObj());
 
 		for(var i = 0; i < this.assassins.length; i++)
 			if(this.assassins[i].id !== assassin.id)
