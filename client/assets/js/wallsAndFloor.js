@@ -29,6 +29,8 @@ function WallsAndFloor (stage, box2d) {
       w : manager.canvas.width, 
       h : 0,
    });
+
+ 
    stage.create(floor);
 
 }

@@ -6,6 +6,7 @@ function Manager (box2d) {
 	this.box2d = box2d;
 
 	this.items = [];
+	this.floors = [];
 	this.assassins = [];
 	this.totalAssassins = 0;
 
@@ -41,6 +42,12 @@ Manager.prototype = {
 		this.assassins.push(obj);
 		this.totalAssassins++;
 		this.user = obj;
+	},
+	createFloor : function (obj) {
+		var floor = this.box2d.rect(obj);
+
+		this.floors.push(floor);
+		this.items.push(floor);
 	},
 	createAssassin : function (obj) {
 		this.items.push(obj);
@@ -84,6 +91,11 @@ Manager.prototype = {
 	        if(obj.opts)
 	            return obj.opts.id === id;
 	     });
+	},
+	updatePosition : function (obj) {
+		var assassin = this.getById(obj.id);
+		if(assassin && assassin.setPosition)
+			assassin.setPosition(obj);
 	},
 	tick : function (cb) {
       	this.box2d.tick();

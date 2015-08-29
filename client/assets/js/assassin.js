@@ -23,6 +23,7 @@ function Assassin (stage, bullet, box2d, obj, user) {
 	// Movement
 	this.left;
 	this.right;
+	this.directionFacing = 'right';
 	this.shooting;
 	this.jumpAvailable = true;
 
@@ -67,9 +68,11 @@ Assassin.prototype = {
 		this.body.setY(obj.y);
 	},
 	moveRight : function () {
+		this.directionFacing = 'right';
 		this.body.move('right');
 	},
 	moveLeft : function () {
+		this.directionFacing = 'left';
 		this.body.move('left');
 	},
 	jump : function () {
@@ -85,14 +88,15 @@ Assassin.prototype = {
 	},
 	shoot : function () {
 		this.bullets++;
-		var x = this.shootDirection === 'right' ? this.getX() + this.w + 10 : this.getX() - 20;
+		console.log(this.directionFacing);
+		var x = this.directionFacing === 'right' ? this.getX() + this.w + 10 : this.getX() - 20;
 		var bullet = new this.Bullet(this.box2d, {
 		   	x : x,
 		   	y : this.getY() + (this.h / 2), 
 		   	w : 10, 
 		   	h : 10,
 	   		id : this.bullets,
-	   		direction : this.shootDirection
+	   		direction : this.directionFacing
 		});
 		bullet.init();
 		bullet.shoot();
@@ -100,7 +104,7 @@ Assassin.prototype = {
 	},
 	contact : function (item) {
 		var id = null, self = this;
-		
+
 		if(item){
 			id = item.id ? item.id : item.opts.id;
 		}
@@ -123,6 +127,7 @@ Assassin.prototype = {
 	},
 	destroy : function (obj) {
 		this.body.destroy();
+		this.stage.destroy();
 	},
 	getX : function () {
 		return this.body.getX() - (this.w / 2);

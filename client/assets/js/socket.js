@@ -14,6 +14,7 @@ Socket.prototype = {
 		this.on('newAssassin', this.newAssassin.bind(this));
 		this.on('userAssassin', this.userAssassin.bind(this));
 		this.on('updatePosition', this.updateObjectPositions.bind(this));
+		this.on('createFloor', this.createFloor.bind(this));
 	},
 	updateObjectPositions : function (obj) {
 		if(this.stage)
@@ -23,6 +24,9 @@ Socket.prototype = {
 		var assassin = new Assassin(stage, this.bullet, this.box2d, obj, true);	
 		assassin.init();
 		this.stage.createUser(assassin);
+	},
+	createFloor : function (obj) {
+		this.stage.createFloor(obj);
 	},
 	newAssassin : function (obj) {
 	   var assassin = new Assassin(stage, this.bullet, this.box2d, obj);

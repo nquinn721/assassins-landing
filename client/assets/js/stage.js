@@ -48,6 +48,9 @@ Stage.prototype = {
    create : function (obj) {
       this.manager.create(obj);
    },
+   createFloor : function (obj) {
+      this.manager.createFloor(obj);
+   },
    ticker : function () {
       var self = this;
       createjs.Ticker.addEventListener('tick', function () {
@@ -67,7 +70,12 @@ Stage.prototype = {
    keyDown : function (e) {
       this.socket.emit('keyDown', {id : this.manager.user.id, keycode : e.keyCode});
    },
-
+   updatePosition : function (obj) {
+      this.manager.updatePosition(obj);
+   },
+   destroy : function () {
+      $('.die').show();
+   },
    followUser : function () {
       if(!this.manager.user)return;
 

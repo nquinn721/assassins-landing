@@ -6,8 +6,8 @@ var url = __dirname + '/../../client/assets/js/',
 	Bullet = require(url + 'bullet.js'),
 	Manager = require(url + 'manager.js'),
 	WallsAndFloor = require(url + 'wallsAndFloor.js'),
+	Map = require(url + 'map.js'),
 	_ = require('underscore');
-
 
 
 box2d = new box2d(Box2D, Body);
@@ -25,6 +25,8 @@ function Stage (io) {
    		height : 2400
    	}
 
+   	this.map = new Map(box2d, manager, io);
+   	this.map.init();
    	this.canvas;
 }
 
@@ -55,7 +57,7 @@ Stage.prototype = {
 		this.items.push(assassin);
 		
 		if(this.assassins.length === 2)
-			assassin.shootDirection = 'left';
+			assassin.directionFacing = 'left';
 
 		socket.assassin = assassin;
 
@@ -65,6 +67,9 @@ Stage.prototype = {
 		for(var i = 0; i < this.assassins.length; i++)
 			if(this.assassins[i].id !== assassin.id)
 				socket.emit('newAssassin', this.assassins[i].getObj());
+
+		this.map.sendFloors();
+
 
 	},
 	beginContact : function (contact) {
@@ -114,15 +119,14 @@ Stage.prototype = {
 	ticker : function () {
 		var self = this;
 		this.interval = setInterval(function () {
-			manager.tick(self.tick);
+			manager.tick(self.tick.bind(self));
 		}, 1000 / 60);
 	},
 	getById : function (id) {
 	  return _.findWhere(this.items, {id : id});
 	},
 	tick : function () {
-
-	    if(this.frames % 10 === 0)
+	    if(this.frames % 1000 === 0)
 	    	this.updateClientPositions();
 
 	},
