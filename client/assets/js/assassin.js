@@ -56,7 +56,6 @@ Assassin.prototype = {
 		this.body = this.box2d.rect(this.getObj());
 	},
 	setPosition : function (obj) {
-		console.log(obj.x);
 		this.body.setX(obj.x);
 		this.body.setY(obj.y);
 	},

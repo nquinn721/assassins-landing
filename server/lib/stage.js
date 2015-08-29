@@ -107,14 +107,13 @@ Stage.prototype = {
 	    this.frames++;
 
 
-	    if(this.frames % 100 === 0)
-	    	this.updateClientPositions();
+    	this.updateClientPositions();
 
 	},
 	updateClientPositions : function () {
 		for(var i = 0; i < this.items.length; i++){
 			var obj = this.items[i].getObj();
-			// this.io.emit('updatePosition', obj);
+			this.io.emit('updatePosition', obj);
 		}
 	}
 }

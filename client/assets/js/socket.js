@@ -16,7 +16,8 @@ Socket.prototype = {
 		this.on('updatePosition', this.updateObjectPositions.bind(this));
 	},
 	updateObjectPositions : function (obj) {
-		this.stage.updatePosition(obj);
+		if(this.stage)
+			this.stage.updatePosition(obj);
 	},
 	userAssassin : function (obj) {
 		var assassin = new Assassin(stage, this.bullet, this.box2d, obj, true);	
