@@ -35,7 +35,7 @@ io.on('connection', function (socket) {
 	});
 	socket.on('disconnect', function () {
 		if(socket.assassin){
-			stage.logout(socket.assassin.id);
+			stage.logout(socket.assassin);
 			io.emit('destroyAssassin', socket.assassin.getObj());
 		}
 	});

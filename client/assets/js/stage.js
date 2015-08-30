@@ -62,7 +62,7 @@ Stage.prototype = {
    setupSocketEvents : function () {
       this.socket.on('keyUp', this.manager.handleKeyUp.bind(this.manager));
       this.socket.on('keyDown', this.manager.handleKeyDown.bind(this.manager));
-      this.socket.on('destroyAssassin', this.manager.removeAssassin.bind(this.manager)); 
+      this.socket.on('destroyAssassin', this.manager.destroyAssassin.bind(this.manager)); 
    },
    keyUp : function (e) {
       this.socket.emit('keyUp', {id : this.manager.user.id, keycode : e.keyCode});
@@ -74,6 +74,7 @@ Stage.prototype = {
       this.manager.updatePosition(obj);
    },
    destroy : function () {
+      console.log('destroy');
       $('.die').show();
    },
    followUser : function () {
@@ -97,6 +98,6 @@ Stage.prototype = {
    
    tick : function () {
       this.followUser();
-      // this.stage.update();
+      this.stage.update();
    }
 }

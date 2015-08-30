@@ -15,9 +15,6 @@ manager = new Manager(box2d);
 
 function Stage (io) {
 	this.io = io;
-   	this.totalAsassins = 0;
-   	this.items = [];
-   	this.assassins = [];
    	this.frames = 0;
 
    	this.canvas = {
@@ -35,28 +32,26 @@ Stage.prototype = {
 		
 	},
 	init : function () {
-		WallsAndFloor(this, box2d);
+		WallsAndFloor(manager, this, box2d);
 		manager.init();
 		this.ticker();
 		
 	},
 	login : function (io, socket) {
 		var assassin;
-		this.totalAsassins++;
 
-		if(this.assassins.length === 1){
+		if(manager.assassins.length === 1){
 			x = Math.random() * 200;
 		}else {
 			x = Math.random() * 200 + (manager.canvas.width - 200);
 
 		}
-		assassin = new Assassin(this, Bullet, box2d, {id : 'Assassin' + this.totalAsassins, x : x, y : 10});
-		assassin.init();
 
-		this.assassins.push(assassin);
-		this.items.push(assassin);
-		
-		if(this.assassins.length === 2)
+		assassin = new Assassin(this, Bullet, box2d, {id : 'Assassin' + manager.totalAssassins, x : x, y : 10});
+		assassin.init();
+		manager.createAssassin(assassin);
+
+		if(manager.assassins.length === 2)
 			assassin.directionFacing = 'left';
 
 		socket.assassin = assassin;
@@ -64,38 +59,22 @@ Stage.prototype = {
 		socket.emit('userAssassin', assassin.getObj());
 		socket.broadcast.emit('newAssassin', assassin.getObj());
 
-		for(var i = 0; i < this.assassins.length; i++)
-			if(this.assassins[i].id !== assassin.id)
-				socket.emit('newAssassin', this.assassins[i].getObj());
+		for(var i = 0; i < manager.assassins.length; i++)
+			if(manager.assassins[i].id !== assassin.id)
+				socket.emit('newAssassin', manager.assassins[i].getObj());
 
 		this.map.sendFloors();
 
 
 	},
-	beginContact : function (contact) {
-		var one = contact.GetFixtureA().GetBody().GetUserData(),
-		  	two = contact.GetFixtureB().GetBody().GetUserData();
-		one = this.getById(one.id);
-		two = this.getById(two.id);
-
-
-		if(one && one.contact && !one.hasContact){
-			one.hasContact = true;
-			one.contact(two);
-		}
-		if(two && two.contact && !two.hasContact){
-			two.hasContact = true;
-			two.contact(one);
-		}
-
-	},
-	logout : function (id) {
-		var item = this.getById(id);
-		this.destroy(item);
+	
+	logout : function (assassin) {
+		this.destroy(assassin);
 	},
 	destroy : function (item) {
-	  	this.items.splice(this.items.indexOf(item), 1);
-	  	this.assassins.splice(this.assassins.indexOf(item), 1);
+		manager.destroyAssassin(item);
+		this.io.emit('destroyAssassin', item.getObj());
+
 	},
 	create : function (obj) {
 		manager.create(obj);
@@ -122,52 +101,22 @@ Stage.prototype = {
 			manager.tick(self.tick.bind(self));
 		}, 1000 / 60);
 	},
-	getById : function (id) {
-	  return _.findWhere(this.items, {id : id});
-	},
 	tick : function () {
-	    if(this.frames % 1000 === 0)
+		
+		this.frames++;
+	    if(this.frames % 10 === 0)
 	    	this.updateClientPositions();
 
 	},
 	updateClientPositions : function () {
-		for(var i = 0; i < this.items.length; i++){
-			var obj = this.items[i].getObj();
-			// this.io.emit('updatePosition', obj);
+		for(var i = 0; i < manager.items.length; i++){
+			if(manager.items[i].getObj){
+				var obj = manager.items[i].getObj();
+				this.io.emit('updatePosition', obj);
+			}
 		}
 	}
 }
-
-
-// Floor
-var floor = box2d.rect({
-   x : 0, 
-   y : 380, 
-   w : 800, 
-   h : 20,
-   id : 'Floor'
-});
-// Left Wall
-var leftwall = box2d.rect({
-   x : 0, 
-   y : 0, 
-   w : 0, 
-   h : 400,
-});
-// Right Wall
-var rightwall = box2d.rect({
-   x : 800, 
-   y : 0, 
-   w : 0, 
-   h : 400,
-});
-// Ceiling
-var ceiling = box2d.rect({
-   x : 0, 
-   y : 0, 
-   w : 800, 
-   h : 0,
-});
 
 
 module.exports = Stage;

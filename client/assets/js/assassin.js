@@ -88,7 +88,6 @@ Assassin.prototype = {
 	},
 	shoot : function () {
 		this.bullets++;
-		console.log(this.directionFacing);
 		var x = this.directionFacing === 'right' ? this.getX() + this.w + 10 : this.getX() - 20;
 		var bullet = new this.Bullet(this.box2d, {
 		   	x : x,
@@ -104,7 +103,6 @@ Assassin.prototype = {
 	},
 	contact : function (item) {
 		var id = null, self = this;
-
 		if(item){
 			id = item.id ? item.id : item.opts.id;
 		}
@@ -125,9 +123,12 @@ Assassin.prototype = {
 		this.hasContact = false;
 
 	},
-	destroy : function (obj) {
+	destroy : function () {
+		this.destroyBody();
+		this.stage.destroy(this);
+	},
+	destroyBody : function () {
 		this.body.destroy();
-		this.stage.destroy();
 	},
 	getX : function () {
 		return this.body.getX() - (this.w / 2);

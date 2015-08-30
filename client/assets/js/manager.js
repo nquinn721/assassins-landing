@@ -2,13 +2,16 @@ if(typeof module !== 'undefined')
 	var _ = require('underscore');
 
 
-function Manager (box2d) {
+function Manager (box2d, Assassin) {
 	this.box2d = box2d;
 
 	this.items = [];
 	this.floors = [];
 	this.assassins = [];
 	this.totalAssassins = 0;
+
+	// Classes
+	this.Assassin = Assassin;
 
 	// Local User
 	this.user;
@@ -55,6 +58,10 @@ Manager.prototype = {
 		this.totalAssassins++;
 	},
 	destroyAssassin : function (obj) {
+		obj = this.getById(obj.id);
+		
+		if(obj && obj.destroyBody)
+			obj.destroyBody();
 		this.removeItem(obj);
 		this.removeAssassin(obj);
 		this.totalAssassins--;

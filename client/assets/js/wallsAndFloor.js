@@ -1,5 +1,5 @@
 
-function WallsAndFloor (stage, box2d) {
+function WallsAndFloor (manager, stage, box2d) {
    // Floor
    var floor = box2d.rect({
       x : 0, 
@@ -30,7 +30,7 @@ function WallsAndFloor (stage, box2d) {
       h : 0,
    });
 
- 
+
    stage.create(floor);
 
 }
