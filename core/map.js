@@ -12,7 +12,7 @@ Map.prototype = {
 			this.create();
 	},
 	create : function () {
-		for(var i = 0; i < 20; i++){
+		for(var i = 0; i < 10; i++){
 			var obj = {
 		         x : Math.random() * manager.canvas.width,
 		         y : Math.random() * manager.canvas.height,
@@ -33,6 +33,11 @@ Map.prototype = {
 	sendToClient : function (obj) {
 	    this.box2d.rect(obj);
 		this.io.emit('createFloor', obj);
+	},
+	reset : function () {
+		this.floors = [];
+		this.create();
+		this.sendFloors();
 	}
 
 }

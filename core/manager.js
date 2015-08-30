@@ -52,6 +52,9 @@ Manager.prototype = {
 		this.floors.push(floor);
 		this.items.push(floor);
 	},
+	removeFloor : function (obj) {
+		this.floors.splice(this.floors.indexOf(obj));
+	},
 	createAssassin : function (obj) {
 		this.items.push(obj);
 		this.assassins.push(obj);

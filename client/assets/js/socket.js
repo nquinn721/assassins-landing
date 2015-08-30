@@ -1,7 +1,8 @@
-function Socket (box2d, bullet) {
+function Socket (box2d, bullet, view) {
 	this.box2d = box2d;
 	this.io = io.connect();
 	this.bullet = bullet;
+	this.view = view;
 }
 
 Socket.prototype = {
@@ -9,6 +10,7 @@ Socket.prototype = {
 		this.stage = stage;
 		this.emit('login');
 		this.setupListeners();
+		this.view.init(this);
 	},
 	setupListeners : function () {
 		this.on('newAssassin', this.newAssassin.bind(this));
@@ -24,9 +26,10 @@ Socket.prototype = {
 		var assassin = new Assassin(stage, this.bullet, this.box2d, obj, true);	
 		assassin.init();
 		this.stage.createUser(assassin);
+		this.view.focus(assassin.getObj());
 	},
-	createFloor : function (obj) {
-		this.stage.createFloor(obj);
+	createMap : function (obj) {
+		this.stage.createMap(obj);
 	},
 	newAssassin : function (obj) {
 	   var assassin = new Assassin(stage, this.bullet, this.box2d, obj);
@@ -34,6 +37,7 @@ Socket.prototype = {
 	   this.stage.createAssassin(assassin);
 	},
 	emit : function (event, data) {
+		console.log(event);
 		this.io.emit(event, data);
 	},
 	on : function (event, cb) {

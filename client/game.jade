@@ -1,6 +1,8 @@
 extends layout
 
 block content
+	.reset
+		input(type="button", value="Reset")
 	.die
 		span You Just Died!
 	.viewport
@@ -9,14 +11,16 @@ block content
 	script(src='socket.io/socket.io.js')
 	script(src='lib/createjs.js')
 	script(src='lib/Box2dWeb-2.1.a.3.min.js')
-	script(src='js/manager.js')
-	script(src='js/body.js')
-	script(src='js/bullet.js')
-	script(src='js/assassin.js')
-	script(src='js/box2d.js')
+	script(src='manager.js')
+	script(src='body.js')
+	script(src='bullet.js')
+	script(src='assassin.js')
+	script(src='box2d.js')
 	script(src='js/stage.js')
 	script(src='js/socket.js')
-	script(src='js/wallsAndFloor.js')
+	script(src='wallsAndFloor.js')
+	script(src='js/view.js')
 	script(src='js/main.js')
 	script(src='js/canvas.js')
+	script(src='js/client.js')
 

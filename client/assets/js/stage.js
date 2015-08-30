@@ -1,20 +1,14 @@
 
-function Stage (socket, manager) {
+function Stage (socket, manager, view) {
    this.socket = socket;
    this.manager = manager;
+   this.view = view;
 
 
    this.stage = new createjs.Stage(document.getElementById('game'));
    this.assassins = 0;
    this.items = [];
-
-   this.view = {
-      width : 800,
-      height : 400
-   };
-
-   this.canvasElement = $('canvas');
-
+  
    this.user;
 }
 
@@ -48,9 +42,7 @@ Stage.prototype = {
    create : function (obj) {
       this.manager.create(obj);
    },
-   createFloor : function (obj) {
-      this.manager.createFloor(obj);
-   },
+   
    ticker : function () {
       var self = this;
       createjs.Ticker.addEventListener('tick', function () {
@@ -74,30 +66,12 @@ Stage.prototype = {
       this.manager.updatePosition(obj);
    },
    destroy : function () {
-      console.log('destroy');
       $('.die').show();
    },
-   followUser : function () {
-      if(!this.manager.user)return;
-
-      var viewWidth = this.view.width,
-         viewHeight = this.view.height,
-         canvasWidth = this.manager.canvas.width,
-         canvasHeight = this.manager.canvas.height,
-         user = this.manager.user,
-         canvas = this.canvasElement,
-         top = Math.abs(parseInt(canvas.css('top')));
-
-      // Move canvas left and right
-      if(user.x > viewWidth / 2 && user.x  < canvasWidth - (viewWidth / 2))
-         canvas.css('left', -(user.x - viewWidth / 2));
-      // Move canvas up and down
-      if(user.y + user.h > viewHeight / 2 && user.y < canvasHeight - viewHeight / 2)
-            canvas.css('top', -(user.y - viewHeight / 2));
-   },
+   
    
    tick : function () {
-      this.followUser();
+      this.view.tick();
       this.stage.update();
    }
 }

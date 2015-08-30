@@ -1,4 +1,4 @@
-var url = __dirname + '/../../client/assets/js/',
+var url = __dirname + '/../../core/',
 	Box2D = require('./box2d.js'),
 	box2d = require(url + 'box2d.js'),
 	Assassin = require(url + 'assassin.js'),
@@ -93,6 +93,7 @@ Stage.prototype = {
 				socket.broadcast.emit('keyDown', {obj : socket.assassin.getObj(), keyCode : obj.keycode});
 			}
 		});
+		socket.on('mapReset', this.map.reset.bind(this.map));
 		
 	},
 	ticker : function () {
@@ -112,7 +113,7 @@ Stage.prototype = {
 		for(var i = 0; i < manager.items.length; i++){
 			if(manager.items[i].getObj){
 				var obj = manager.items[i].getObj();
-				this.io.emit('updatePosition', obj);
+				// this.io.emit('updatePosition', obj);
 			}
 		}
 	}
