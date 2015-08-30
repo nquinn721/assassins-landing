@@ -104,7 +104,7 @@ Stage.prototype = {
 	tick : function () {
 		
 		this.frames++;
-	    if(this.frames % 10 === 0)
+	    if(this.frames % 30 === 0)
 	    	this.updateClientPositions();
 
 	},
